@@ -8,6 +8,12 @@ module.exports = function(app) {
    // Log in
    app.post('/login', users.login);
 
+   // Get self info
+   app.get('/me', users.getSelf);
+
+   // Add friend
+   app.put('/addFriend', users.addFriend);
+
    // Retrieve all Notes
    // app.get('/notes', notes.findAll);
 

@@ -46,7 +46,7 @@ exports.login = function(req, res) {
       if(user) {
          bcrypt.compare(pw, user.password).then(match => {
             if(match) { // Password matches
-               var token = jwt.sign({ id: user._id }, dbConfig.secret, {
+               var token = jwt.sign({ id: user._id, userName: user.userName }, dbConfig.secret, {
                   expiresIn: 86400 // expires in 24 hours
                 });
                return res.status(200).send({message: "Successfully logged in!", token: token, auth: true});
@@ -58,4 +58,62 @@ exports.login = function(req, res) {
          return res.status(404).send({message: "User doesn't exist!", auth: false});
       }
    })
+}
+
+exports.getSelf = function(req, res) {
+   var token = req.headers['x-access-token'];
+   
+   if (!token)
+      return res.status(401).send({ auth: false, message: 'No token provided.' });
+
+   jwt.verify(token, dbConfig.secret, function(err, decoded) {
+      if(err)
+         return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      
+      User.findById(decoded.id).then(user => {
+         if(user)
+            return res.status(200).send(user);
+      })
+   })
+}
+
+exports.addFriend = function(req, res) {
+   var token = req.headers['x-access-token'];
+   var friendId;
+
+   if (!token)
+      return res.status(401).send({ auth: false, message: 'No token provided.' });
+   
+   if (!req.query || !req.query.id) {
+      return res.status(400).send({ auth: true, message: 'Invalid friend id. '});
+   } else {
+      friendId = req.query.id;
+   }
+
+   jwt.verify(token, dbConfig.secret, function(err, decoded) {
+      if(err)
+         return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      
+      User.findById(friendId, function(err, friend) {
+         if(friend) {
+            User.findById(decoded.id).then(self => {
+               if(self) {
+                  for(var i = 0; i < self.friends.length; i++) {
+                     if(self.friends[i].userName === friend.userName) {
+                        console.log("TRUU");
+                        return res.status(400).send({ auth: true, message: 'User already in friends list! '});
+                     }
+                  }
+                  console.log(self.friends);
+                  self.friends = self.friends.concat({userName: friend.userName});
+                  self.save();
+                  return res.status(200).send({ auth: true, message: 'Added friend: '+friend.userName});
+               }
+            })
+         } else {
+            return res.status(400).send({ auth: true, message: 'Friend not found. '});
+         }
+      })
+         // User.findByIdAndUpdate(decoded.id, )
+   });
 }
