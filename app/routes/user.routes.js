@@ -14,6 +14,9 @@ module.exports = function(app) {
    // Add friend
    app.put('/addFriend', users.addFriend);
 
+   // Remove friend
+   app.put('/deleteFriend', users.deleteFriend);
+
    // Retrieve all Notes
    // app.get('/notes', notes.findAll);
 

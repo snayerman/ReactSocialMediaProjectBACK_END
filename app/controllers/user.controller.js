@@ -114,6 +114,40 @@ exports.addFriend = function(req, res) {
             return res.status(400).send({ auth: true, message: 'Friend not found. '});
          }
       })
-         // User.findByIdAndUpdate(decoded.id, )
+   });
+}
+
+exports.deleteFriend = function(req, res) {
+   var token = req.headers['x-access-token'];
+   var friendId;
+
+   if (!token)
+      return res.status(401).send({ auth: false, message: 'No token provided.' });
+
+   if (!req.query || !req.query.id) {
+      return res.status(400).send({ auth: true, message: 'Invalid friend id. '});
+   } else {
+      friendId = req.query.id;
+   }
+
+   jwt.verify(token, dbConfig.secret, function(err, decoded) {
+      if(err)
+         return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      
+      User.findById(friendId, function(err, friend) {
+         if(friend) {
+            User.findById(decoded.id).then(self => {
+               if(self) {                  
+                  let newFriends = self.friends.filter((frnd) => {
+                     return frnd.userName !== friend.userName;
+                  });
+                  self.save();
+                  return res.status(200).send({ auth: true, message: 'Removed friend: '+friend.userName});
+               }
+            })
+         } else {
+            return res.status(400).send({ auth: true, message: 'Friend not found. '});
+         }
+      })
    });
 }
