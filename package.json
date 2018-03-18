@@ -1,0 +1,26 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "server for project",
+  "main": "server.js",
+  "scripts": {
+    "test": "test",
+    "run": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snayerman/ReactSocialMediaProjectFRONT_END.git"
+  },
+  "author": "sam",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/snayerman/ReactSocialMediaProjectFRONT_END/issues"
+  },
+  "homepage": "https://github.com/snayerman/ReactSocialMediaProjectFRONT_END#readme",
+  "dependencies": {
+    "bcrypt": "^1.0.3",
+    "express": "^4.16.3",
+    "jsonwebtoken": "^8.2.0",
+    "mongoose": "^5.0.10"
+  }
+}
