@@ -46,6 +46,7 @@ app.get('/', function(req, res){
 
 require('./app/routes/note.routes.js')(app);
 require('./app/routes/user.routes.js')(app);
+require('./app/routes/post.routes.js')(app);
 
 // listen for requests
 app.listen(3001, function(){

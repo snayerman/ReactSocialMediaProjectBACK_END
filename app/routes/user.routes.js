@@ -12,10 +12,12 @@ module.exports = function(app) {
    app.get('/me', users.getSelf);
 
    // Add friend
-   app.put('/addFriend', users.addFriend);
+   // app.put('/addFriend', users.addFriend);
+   app.post('/friend', users.addFriend);
 
    // Remove friend
-   app.put('/deleteFriend', users.deleteFriend);
+   // app.put('/deleteFriend', users.deleteFriend);
+   app.delete('/friend', users.deleteFriend);
 
    // Get all users
    app.get('/users', users.getAll);

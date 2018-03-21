@@ -4,18 +4,18 @@ var mongoose = require('mongoose');
 //    userName: String
 // }, { _id : false });
 
-var postsSchema = mongoose.Schema({
-   autho: String,
+var postSchema = mongoose.Schema({
+   author: String,
    category: String,
    content: String,
    friend: String
-}, { _id : false });
+});
 
 var UserSchema = mongoose.Schema({
    userName: String,
    password: String,
    friends: [String],
-   posts: [postsSchema]
+   posts: [postSchema]
 }, {
     timestamps: true
 });
