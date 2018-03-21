@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
 
-var friendsSchema = mongoose.Schema({
-   userName: String
-}, { _id : false });
+// var friendsSchema = mongoose.Schema({
+//    userName: String
+// }, { _id : false });
 
 var postsSchema = mongoose.Schema({
    autho: String,
@@ -14,7 +14,7 @@ var postsSchema = mongoose.Schema({
 var UserSchema = mongoose.Schema({
    userName: String,
    password: String,
-   friends: [friendsSchema],
+   friends: [String],
    posts: [postsSchema]
 }, {
     timestamps: true

@@ -34,6 +34,8 @@ exports.signup = function(req, res) {
 };
 
 exports.login = function(req, res) {
+   console.log(req.body);
+   console.log(req.headers);
    if(!req.body.userName || req.body.userName.length === 0)
       return res.status(400).send({message: "Missing userName", auth: false});
 
@@ -77,6 +79,26 @@ exports.getSelf = function(req, res) {
    })
 }
 
+exports.getAll = function(req, res) {
+   var token = req.headers['x-access-token'];
+   
+   if (!token)
+      return res.status(401).send({ auth: false, message: 'No token provided.' });
+   
+      jwt.verify(token, dbConfig.secret, function(err, decoded) {
+         if(err)
+            return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+         
+         User.find({}, 'userName', (err, users) => {
+            if(!err) {
+               return res.status(200).send({users});
+            }
+            return res.status(400).send({ message: 'Couldnt find users'});
+         })
+      })
+
+}
+
 exports.addFriend = function(req, res) {
    var token = req.headers['x-access-token'];
    var friendId;
@@ -90,6 +112,8 @@ exports.addFriend = function(req, res) {
       friendId = req.query.id;
    }
 
+   console.log("Adding friend", friendId);
+
    jwt.verify(token, dbConfig.secret, function(err, decoded) {
       if(err)
          return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
@@ -99,13 +123,13 @@ exports.addFriend = function(req, res) {
             User.findById(decoded.id).then(self => {
                if(self) {
                   for(var i = 0; i < self.friends.length; i++) {
-                     if(self.friends[i].userName === friend.userName) {
+                     if(self.friends[i] === friend.userName) {
                         console.log("TRUU");
                         return res.status(400).send({ auth: true, message: 'User already in friends list! '});
                      }
                   }
                   console.log(self.friends);
-                  self.friends = self.friends.concat({userName: friend.userName});
+                  self.friends = self.friends.concat(friend.userName);
                   self.save();
                   return res.status(200).send({ auth: true, message: 'Added friend: '+friend.userName});
                }
@@ -130,17 +154,21 @@ exports.deleteFriend = function(req, res) {
       friendId = req.query.id;
    }
 
+   console.log("\nDELETING FRIEND", friendId);
+
    jwt.verify(token, dbConfig.secret, function(err, decoded) {
       if(err)
          return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
       
       User.findById(friendId, function(err, friend) {
          if(friend) {
+            console.log("DELETE FRIEND FOUND");
             User.findById(decoded.id).then(self => {
                if(self) {                  
                   let newFriends = self.friends.filter((frnd) => {
-                     return frnd.userName !== friend.userName;
+                     return frnd !== friend.userName;
                   });
+                  self.friends = newFriends;
                   self.save();
                   return res.status(200).send({ auth: true, message: 'Removed friend: '+friend.userName});
                }
@@ -150,4 +178,11 @@ exports.deleteFriend = function(req, res) {
          }
       })
    });
+}
+
+exports.createPost = function(req, res) {
+   var token = req.headers['x-access-token'];
+
+   if (!token)
+      return res.status(401).send({ auth: false, message: 'No token provided.' });
 }
