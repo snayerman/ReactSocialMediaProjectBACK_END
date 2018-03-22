@@ -8,4 +8,7 @@ module.exports = function(app) {
    // Get all posts
    app.get('/post', posts.getAllPosts);
 
+   // Delete post
+   app.delete('/post/:id', posts.deletePost);
+
 }

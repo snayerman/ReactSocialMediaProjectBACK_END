@@ -38,6 +38,32 @@ exports.newPost = function(req, res) {
    })
 }
 
+exports.deletePost = function(req, res) {
+   var token = getToken(req);
+   var self = verifyToken(token, res);
+
+   if (!req.params.id)
+      return res.status(400).send({ message: "No ID specified" });
+
+   var id = req.params.id;
+
+   User.findById(self.id, (err, usr) => {
+      if(usr) {
+         usr.posts = usr.posts.filter(post => {
+            return post._id !== id;
+         });
+         usr.save();
+
+         Post.findById(id, (err, post) => {
+            if(post) {
+               post.remove();
+               return res.status(200).send({ message: "Post deleted!" });
+            }
+         })
+      }
+   })
+}
+
 exports.getAllPosts = function(req, res) {
    var token = getToken(req);
    var self = verifyToken(token, res);
